@@ -1,23 +1,13 @@
-# C++ Project Starter Template
+# 2D Engine - by Nikita Muzychenko
 
-This is a little quick-start project template for C++ projects which utilise a Core/App project architecture. There are two included projects - one called _Core_, and one called _App_. [Premake](https://github.com/premake/premake-core) is used to generate project files.
+## Mission
+This project is a small self training to get important skills for working in game industry. The main thing there is the self written library for making 2d game development easier with a small demonstartion of this library usage within an example JRPG game. If you want to use this library for your own project, you are free to go. Any contribution or discussion are also always welcome.
 
-Core builds into a static library and is meant to contain common code intended for use in multiple applications. App builds into an executable and links the Core static library, as well as provides an include path to Core's code.
-
-The `Scripts/` directory contains build scripts for Windows and Linux, and the `Vendor/` directory contains Premake binaries (currently version `5.0-beta2`).
-
-## Getting Started
-1. Clone this repository or use the "Use this template" button on GitHub to quickly set up your own repository based on this template
-2. `App/` and `Core/` are the two projects - you can edit the names of these folders and their contents to suit
-3. The three included Premake build files are `Build.lua`, `Core/Build-Core.lua` and `App/Build-App.lua` - you can edit these to customise your build configurations, edit the names of your projects and workspace/solution, etc.
-4. Open the `Scripts/` directory and run the appropriate `Setup` script to generate projects files. You can edit the setup scripts to change the type of project that is generated - out of the box they are set to Visual Studio 2022 for Windows and gmake2 for Linux.
-
-Note that no macOS setup script is currently provided; you can duplicate the Linux script and adjust accordingly.
-
-## Included
-- Some example code (in `App/Source` and `Core/Source`) to provide a starting point and test
-- Simple `.gitignore` to ignore project files and binaries
-- Premake binaries for Win/Mac/Linux (`v5.0-beta2`)
+## How to use
+Project has support for Windows, MacOS and Linux. All necessary libraries and includes are already within a directory. Scripts for relevant platforms are provided within a 'Scripts/' directory to setup project using premake5.
+- Windows: open 'Scripts/' and run Setup-Windows.bat, then open generated Visual Studio solution in root directory '2D-Engine/'
+- MacOs: open 'Scripts/' with terminal and run 'sh Setup-Mac.sh'. If you getting permission errors, you have to give permission for scrpits by typing text two commands 'chmod +x ../Vendor/Binaries/Premake/macOS/premake5' and 'chmod +x Setup-Mac.sh'. After that Xcode solution will be generated in root directory '2D-Engine/'
+- Linux: within 'Scripts/' directory run 'chmod +x script.sh && ./script.sh'. Then open generated Gmake solution.
 
 ## License
 - UNLICENSE for this repository (see `UNLICENSE.txt` for more details)

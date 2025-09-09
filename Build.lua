@@ -1,17 +1,22 @@
 -- premake5.lua
-workspace "New Project"
+workspace "2D-Engine"
    architecture "x64"
    configurations { "Debug", "Release", "Dist" }
-   startproject "App"
+   startproject "Game"
 
    -- Workspace-wide build options for MSVC
    filter "system:windows"
       buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus" }
+      
+   filter "system:macosx"
+      architecture "ARM64"
+      system "macosx"
+   filter {}
 
 OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
-group "Core"
-	include "Core/Build-Core.lua"
+group "Engine"
+	include "Engine/Build-Engine.lua"
+	
 group ""
-
-include "App/Build-App.lua"
+	include "Game/Build-Game.lua"
