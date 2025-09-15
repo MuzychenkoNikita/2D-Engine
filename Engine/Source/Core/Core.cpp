@@ -1,42 +1,76 @@
-#include "Core.h"
+#include "Core.hpp"
+#include "Interface.hpp"
 
 #include <iostream>
 #include <glm/glm.hpp>
 #include <array>
-#include <glad/glad.h>
 
-namespace Core {
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+namespace Engine::Core {
 	GameObject::GameObject()
-		:mvertices{ 1.0f, 1.0f, 0.0f,
-					0.0f, 1.0f, 0.0f,
-					0.0f, 0.0f, 0.0f,
-					1.0f, 0.0f, 0.0f }
-		,mtextureCoords{ 0.0f, 0.0f,
+		:mVertices{ 0.0f, 0.0f, 0.0f,
+					1.0f, 0.0f, 0.0f,
+					1.0f, 0.0f, 0.0f,
+					1.0f, 1.0f, 0.0f }
+		,mTexture{ 0.0f, 0.0f,
 						1.0f, 0.0f,
 						1.0f, 1.0f,
 						0.0f, 1.0f }
-		,mIndices{ 0, 1, 3,
+		,mIndices{ 0, 1, 2,
 				  1, 2, 3 }
-		,mposition{0.0f, 0.0f}
+		,mPosition{0.0f, 0.0f}
+        ,mSize{1.0f, 1.0f}
 		,mBufferOffset{NULL}
 	{
 	}
 	void GameObject::SetVertices(std::array<float, 12> vertices)
 	{
-		mvertices = vertices;
+		mVertices = vertices;
 	}
 	void GameObject::SetTextureCoords(std::array<float, 8> textureCoords)
 	{
-		mtextureCoords = textureCoords;
+		mTexture = textureCoords;
 	}
 	void GameObject::SetPosition(glm::vec2 position)
 	{
-		mposition = position;
-		for (int i = 0; i < 4; i++) {
-			mvertices[i * 3 + 0] += mposition.x;
-			mvertices[i * 3 + 1] += mposition.y;
-		}
+		mPosition = position;
+        UpdateVertices();
+        std::cout<<"\nPlayer position: ( " << mPosition.x << " ; " << mPosition.y << " )";
 	}
+    void GameObject::SetSize(glm::vec2 size) {
+        mSize = size;
+        UpdateVertices();
+    }
+    void GameObject::UpdateVertices() {
+        // ( 0 ; 0 )
+        mVertices[0 * 3 + 0] = mPosition.x;
+        mVertices[0 * 3 + 1] = mPosition.y;
+        // ( 1 ; 0 )
+        mVertices[1 * 3 + 0] = mPosition.x + mSize.x;
+        mVertices[1 * 3 + 1] = mPosition.y;
+        // ( 0 ; 1 )
+        mVertices[2 * 3 + 0] = mPosition.x;
+        mVertices[2 * 3 + 1] = mPosition.y + mSize.y;
+        // ( 1 ; 1 )
+        mVertices[3 * 3 + 0] = mPosition.x + mSize.x;
+        mVertices[3 * 3 + 1] = mPosition.y + mSize.y;
+    }
+    void PlayerCharacterObject::MoveX(bool Direction) {
+        if (Direction) {
+            SetPosition(glm::vec2(mPosition.x + (mSpeed * DeltaTime), mPosition.y));
+        } else {
+            SetPosition(glm::vec2(mPosition.x - (mSpeed * DeltaTime), mPosition.y));
+        }
+    }
+    void PlayerCharacterObject::MoveY(bool Direction) {
+        if (Direction) {
+            SetPosition(glm::vec2(mPosition.x, mPosition.y + (mSpeed * DeltaTime)));
+        } else {
+            SetPosition(glm::vec2(mPosition.x, mPosition.y - (mSpeed * DeltaTime)));
+        }
+    }
 
 
 	Scene::Scene()
@@ -169,6 +203,7 @@ namespace Core {
 	}
 	void Scene::Render()
 	{
+        CalculateDeltaTime();
 		//Draw Static Objects
 		glBindVertexArray(mStaticVAO);
 		glDrawElements(GL_TRIANGLES, 1000, GL_UNSIGNED_INT, 0);
@@ -188,8 +223,36 @@ namespace Core {
 		glDeleteBuffers(1, &mDynamicVBO);
 		glDeleteBuffers(1, &mDynamicEBO);
 		glDeleteVertexArrays(1, &mDynamicVAO);
+        
 	}
 	PlayerCharacterObject::PlayerCharacterObject()
 	{
 	}
+    void CalculateDeltaTime() {
+        static float LastTime = glfwGetTime(); // initialize once
+        float CurrentTime = glfwGetTime();     // read once per frame
+        DeltaTime = CurrentTime - LastTime;    // delta
+        LastTime = CurrentTime;                // update for next frame
+
+        std::cout << "\nDelta Time is " << DeltaTime;
+    }
+    int GetFrameRate() {
+        static int frames = 0;
+        static double last = glfwGetTime();
+        static int cachedFps = 0;
+
+        ++frames;
+
+        double now = glfwGetTime();
+        double elapsed = now - last;
+
+        if (elapsed >= 1.0) {                // update once per second
+            cachedFps = int(frames / elapsed + 0.5);
+            frames = 0;
+            last = now;
+        }
+
+        return cachedFps;
+    }
+    float DeltaTime = 0.f;
 }

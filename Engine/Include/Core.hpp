@@ -6,7 +6,7 @@
 #include <vector>
 #include <glad/glad.h>
 
-namespace Core {
+namespace Engine::Core {
 
 	class GameObject
 	{
@@ -17,22 +17,27 @@ namespace Core {
 		void SetVertices(std::array<float, 12> vertices);
 		void SetTextureCoords(std::array<float, 8> textureCoords);
 		void SetPosition(glm::vec2 position);
+        void SetSize(glm::vec2 size);
 		void SetBufferOffset(size_t bufferOffset) { mBufferOffset = bufferOffset; }
 		//void SetTexture();
 
 		virtual ~GameObject() {}
 
-		const std::array<float, 12>& GetVertices() const { return mvertices; }
-		const std::array<float, 8>& GetTextureCoords() const { return mtextureCoords; }
+		const std::array<float, 12>& GetVertices() const { return mVertices; }
+		const std::array<float, 8>& GetTextureCoords() const { return mTexture; }
 		const std::array<int, 6>& GetIndices() const { return mIndices; }
-		glm::vec2 GetPosition() const { return mposition; }
+		glm::vec2 GetPosition() const { return mPosition; }
 		size_t GetBufferOffset() const { return mBufferOffset; }
 
-	private:
-		std::array<float, 12> mvertices;
-		std::array<float, 8> mtextureCoords;
+	protected:
+        void UpdateVertices();
+        
+    protected:
+		std::array<float, 12> mVertices;
+		std::array<float, 8> mTexture;
 		std::array<int, 6> mIndices;
-		glm::vec2 mposition;
+		glm::vec2 mPosition;
+        glm::vec2 mSize;
 		size_t mBufferOffset;
 
 	};
@@ -43,12 +48,17 @@ namespace Core {
 
 	public:
 		PlayerCharacterObject();
-
-
+        
+        void SetSpeed(float speed) { mSpeed = speed; };
+        void MoveX(bool Direction);
+        void MoveY(bool Direction);
+        
 		~PlayerCharacterObject() {}
+        
+        float GetSpeed() { return mSpeed; }
 
 	private:
-		float mVelocity;
+		float mSpeed;
 
 	};
 
@@ -109,15 +119,10 @@ namespace Core {
 		int mNumberOfDynamicObjects;
 		size_t mNextBufferOffset = 0;
 	};
-
-	class TextureAtlas
-	{
-
-	public:
-		TextureAtlas();
-
-		~TextureAtlas() {}
-	private:
-
-	};
+    
+    // --== Functions ==--
+    void CalculateDeltaTime();
+    int GetFrameRate();
+    // --== Variables ==--
+    extern float DeltaTime;
 }

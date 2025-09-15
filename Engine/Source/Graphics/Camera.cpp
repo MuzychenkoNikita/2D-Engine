@@ -1,8 +1,8 @@
-#include "Camera.h"
+#include "Graphics.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace Core {
+namespace Engine::Graphics {
 
 	Camera::Camera()
 		: mProjectionMatrix(1.f)

@@ -7,7 +7,7 @@ project "Game"
 
    files { "Source/**.hpp", "Source/**.cpp", "Source/**.h", "Source/**.c" }
 
-   includedirs { "Source", "../Engine/Source" }
+   includedirs { "Source", "../Engine/Source", "../Engine/Include" }
    
    externalincludedirs { "../Dependencies/include" }
 

@@ -5,9 +5,10 @@ project "Engine"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
 
-   files { "Source/**.hpp", "Source/**.cpp", "Source/**.h", "Source/**.c" }
+   files { "Source/**.hpp","Source/**.cpp", "Source/**.h", "Source/**.c", 
+	   "Include/**.hpp", "Include/**.h" }
 
-   includedirs { "Source" }
+   includedirs { "Source", "Include" }
    
    externalincludedirs { "../Dependencies/include" }
 
@@ -31,7 +32,7 @@ project "Engine"
       	"IOKit.framework",
       	"CoreVideo.framework",
       	"CoreFoundation.framework" 
-}
+	}
    filter {} 
 
    filter "configurations:Debug"

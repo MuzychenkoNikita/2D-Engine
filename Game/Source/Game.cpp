@@ -5,8 +5,10 @@
 #include "stb_image.h"
 
 #include <iostream>
-#include "Engine/Camera.h"
-#include "Engine/Core.h"
+
+#include "Interface.hpp"
+#include "Graphics.hpp"
+#include "Core.hpp"
 
 #include "Levels.h"
 #include "Objects.h"
@@ -20,8 +22,8 @@ void processInput(GLFWwindow* window);
 void CheckBorder(float vertices[], int XBorder, int YBorder);
 
 // settings
-const unsigned int SCR_WIDTH = 600;
-const unsigned int SCR_HEIGHT = 400;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
 constexpr float GamePixelSize = 0.01;
 
 float XOffset = 0.0f;
@@ -39,14 +41,6 @@ float CamYOffset = 0.f;
 
 float XBorder = 1.f;
 float YBorder = 1.f;
-
-float vertices[] = {
-			// positions                               // texture
-			1.f + XOffset,  1.f + YOffset, 0.0f, 1.0f, 0.0f, 0.0f,     1.f, 1.f,  // top right
-			1.f + XOffset, -1.f + YOffset, 0.0f, 1.0f, 0.0f, 0.0f,    1.f, 0.f,  // bottom right
-		   -1.f + XOffset, -1.f + YOffset, 0.0f, 1.0f, 0.0f, 0.0f,    0.f, 0.f,  // bottom left
-		   -1.f + XOffset,  1.f + YOffset, 0.0f, 1.0f, 0.0f, 0.0f,    0.f, 1.f,  // top left
-};
 
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
@@ -86,7 +80,7 @@ int main()
 
 	// glfw window creation
 	// --------------------
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Game", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -103,9 +97,9 @@ int main()
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
-
+    Engine::Interface::InitiateImGUI(window);
 	// initilazing camera
-	Core::Camera mCamera;
+    Engine::Graphics::Camera mCamera;
 	glm::vec3 mCameraPos;
 
 	// build and compile our shader program
@@ -229,45 +223,26 @@ int main()
 	// -----------
 	while (!glfwWindowShouldClose(window))
 	{
-		//std::cout << glfwGetTime() << std::endl;
-		
-		if ((glfwGetTime() - LastTime) > 0.5f) {
-			LastTime = glfwGetTime();
-			std::cout << LastTime << std::endl;
-			if (AnimationCount < 3) {
-				AnimationOffset += AnimationChange;
-				AnimationCount += 1;
-			}
-			else {
-				AnimationCount = 0;
-				AnimationOffset = 0.f;
-			}
-		}
+        
+		// Printing Frame Rate
+        if (Engine::Core::GetFrameRate() != 0)
+            std::cout<<"\nFrame Rate: "<<Engine::Core::GetFrameRate()<<" FPS";
 		// input
 		// -----
 		processInput(window);
-
-
-
-		CheckBorder(vertices, 1, 1);
-
-		float vertices[] = { // I need to rewrite these shit with one method for vertices
-			// positions                               // texture
-			1.f * GamePixelSize * width + XOffset,  1.f * GamePixelSize * height + YOffset, 0.0f, 1.0f, 0.0f, 0.0f,    (23.f + AnimationOffset) / width, 99.f / height,  // top right
-			1.f * GamePixelSize * width + XOffset, -1.f * GamePixelSize * height + YOffset, 0.0f, 1.0f, 0.0f, 0.0f,    (23.f + AnimationOffset) / width, 69.f / height,  // bottom right
-		   -1.f * GamePixelSize * width + XOffset, -1.f * GamePixelSize * height + YOffset, 0.0f, 1.0f, 0.0f, 0.0f,    (3.f + AnimationOffset) / width, 69.f / height,  // bottom left
-		   -1.f * GamePixelSize * width + XOffset,  1.f * GamePixelSize * height + YOffset, 0.0f, 1.0f, 0.0f, 0.0f,    (3.f + AnimationOffset) / width, 99.f / height,  // top left
-		};
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// render
 		// ------
+        Engine::Interface::RenderImGUI();
+        
 		glClearColor(0.2f, 0.4f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+        
+        Level_0.UpdateDynamicObject(&Player);
 
-		// draw our first triangle
 		glUseProgram(shaderProgram);
 
 		// binding texture
@@ -289,6 +264,8 @@ int main()
 		glUseProgram(shaderProgram);
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        
+        Engine::Interface::CleanImGUI();
 
 
 		//glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
@@ -310,6 +287,9 @@ int main()
 	glDeleteBuffers(1, &EBO);*/
 	glDeleteProgram(shaderProgram);
 	
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
@@ -323,26 +303,21 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		float Xpos = Player.GetPosition().x;
-		XOffset = XOffset - (0.1f * Velocity);
-	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        Player.MoveX(0);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		XOffset = XOffset + (0.1f * Velocity);
+        Player.MoveX(1);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		YOffset = YOffset + (0.1f * Velocity);
+        Player.MoveY(1);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		YOffset = YOffset - (0.1f * Velocity);
+        Player.MoveY(0);
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		Velocity = Velocity - 0.1f;
+        Player.SetSpeed(Player.GetSpeed() - 0.1);
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		Velocity = Velocity + 0.1f;
+        Player.SetSpeed(Player.GetSpeed() + 0.1);
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-		XOffset = 0;
-		YOffset = 0;
-	}
-
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+        Player.SetPosition(glm::vec2(0, 0));
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 		Zoom = Zoom - 0.1f;
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
