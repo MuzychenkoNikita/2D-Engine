@@ -27,12 +27,13 @@ project "Game"
         architecture "ARM64"
         system "macosx"
 	libdirs { "../Dependencies/lib-arm64" }
-	links   { 
-	"glfw3", 
-	"Cocoa.framework",
+	links   {  
+        "glfw3",
+        "OpenGL.framework",
+        "Cocoa.framework",
         "IOKit.framework",
         "CoreVideo.framework",
-        "CoreFoundation.framework" 
+        "CoreFoundation.framework"
 	}
    filter {}  
 

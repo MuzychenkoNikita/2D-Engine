@@ -1,8 +1,14 @@
 #pragma once
 
+
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <queue>
+
+#include "stb_image.h"
+
+#define STBRP_LARGE_RECTS
+#include "stb_rect_pack.h"
 
 namespace Engine::Graphics {
 class Camera
@@ -38,21 +44,30 @@ private:
     glm::mat4 mViewMatrix;
 };
 
+struct AtlasRect {
+    float x = 0, y = 0, w = 10, h = 10;
+};
+
 class TextureAtlas
 {
 public:
     TextureAtlas();
     
-    void AddTexture(std::string path);
+    std::array<float, 8>* AddTexture(const std::string& path);
     void GenTexture();
-
+    
     ~TextureAtlas() {}
     
-    GLuint GetTexture() { return mTextureID; }
+    GLuint GetTextureID() { return mTextureID; }
+    glm::ivec2 GetTextureSize() { return mTextureSize; }
     
 private:
     GLuint mTextureID;
-
+    glm::ivec2 mTextureSize;
+    std::vector<std::string> mPaths;
+    std::queue<unsigned char*> mTexturesData;
+    int mTextureCount;
+    std::deque<std::array<float, 8>> mAtlasRectsCoords;
 };
 
 class Animation
