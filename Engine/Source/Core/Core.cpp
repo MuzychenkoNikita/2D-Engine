@@ -9,30 +9,30 @@
 #include <GLFW/glfw3.h>
 
 namespace Engine::Core {
-	GameObject::GameObject()
-		:mVertices{ 0.0f, 0.0f, 0.0f,
+GameObject::GameObject()
+    :mVertices{ 0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f }
-		,mTexture{ 0.0f, 0.0f,
-						1.0f, 0.0f,
-						1.0f, 1.0f,
-						0.0f, 1.0f }
-		,mIndices{ 0, 1, 2,
+    ,mTexture{&mTexture0}
+    ,mIndices{ 0, 1, 2,
 				  1, 2, 3 }
-		,mPosition{0.0f, 0.0f}
-        ,mSize{1.0f, 1.0f}
-		,mBufferOffset{NULL}
+    ,mPosition{0.0f, 0.0f}
+    ,mSize{1.0f, 1.0f}
+    ,mBufferOffset{NULL}
 	{
 	}
-	void GameObject::SetVertices(std::array<float, 12> vertices)
-	{
-		mVertices = vertices;
-	}
-	void GameObject::SetTextureCoords(std::array<float, 8> textureCoords)
-	{
-		mTexture = textureCoords;
-	}
+void GameObject::SetVertices(std::array<float, 12> vertices)
+{
+    mVertices = vertices;
+}
+void GameObject::SetTextureCoords(std::array<float, 8>* textureCoords)
+{
+    mTexture = textureCoords;
+}
+void GameObject::BindTexture(Engine::Graphics::TextureAtlas* Atlas, const std::string& path) {
+    SetTextureCoords(Atlas->AddTexture(path));
+}
 	void GameObject::SetPosition(glm::vec2 position)
 	{
 		mPosition = position;
@@ -137,15 +137,16 @@ namespace Engine::Core {
 		int vertexOffset = 0;
 		for (auto* object : mStaticObjects) {
 			const auto& mVertices = object->GetVertices();
-			const auto& mTextureCoords = object->GetTextureCoords();
+			const auto* mTextureCoords = object->GetTextureCoords();
 			const auto& mIndices = object->GetIndices();
 
 			for (int i = 0; i < 4; i++) {
 				mVBOData.push_back(mVertices[i * 3 + 0]); //x
 				mVBOData.push_back(mVertices[i * 3 + 1]); //y
 				mVBOData.push_back(mVertices[i * 3 + 2]); //z
-				mVBOData.push_back(mTextureCoords[i * 2 + 0]); //u
-				mVBOData.push_back(mTextureCoords[i * 2 + 1]); //v
+                
+				mVBOData.push_back((*mTextureCoords)[i * 2 + 0]); //u
+				mVBOData.push_back((*mTextureCoords)[i * 2 + 1]); //v
 				std::cout << "VBO Succes" << std::endl;
 			}
 			for (int i = 0; i < 6; i++) {
@@ -166,15 +167,16 @@ namespace Engine::Core {
 		int vertexOffset = 0;
 		for (auto* object : mDynamicObjects) {
 			const auto& mVertices = object->GetVertices();
-			const auto& mTextureCoords = object->GetTextureCoords();
+			const auto* mTextureCoords = object->GetTextureCoords();
 			const auto& mIndices = object->GetIndices();
 
 			for (int i = 0; i < 4; i++) {
 				mVBOData.push_back(mVertices[i * 3 + 0]); //x
 				mVBOData.push_back(mVertices[i * 3 + 1]); //y
 				mVBOData.push_back(mVertices[i * 3 + 2]); //z
-				mVBOData.push_back(mTextureCoords[i * 2 + 0]); //u
-				mVBOData.push_back(mTextureCoords[i * 2 + 1]); //v
+                
+				mVBOData.push_back((*mTextureCoords)[i * 2 + 0]); //u
+				mVBOData.push_back((*mTextureCoords)[i * 2 + 1]); //v
 			}
 			for (int i = 0; i < 6; i++) {
 				mEBOData.push_back(mIndices[i] + vertexOffset);
@@ -190,14 +192,15 @@ namespace Engine::Core {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mDynamicEBO);
 		std::vector<float> mVBOData;
 		const auto& mVertices = object->GetVertices();
-		const auto& mTextureCoords = object->GetTextureCoords();
+		const auto* mTextureCoords = object->GetTextureCoords();
 
 		for (int i = 0; i < 4; i++) {
 			mVBOData.push_back(mVertices[i * 3 + 0]); //x
 			mVBOData.push_back(mVertices[i * 3 + 1]); //y
 			mVBOData.push_back(mVertices[i * 3 + 2]); //z
-			mVBOData.push_back(mTextureCoords[i * 2 + 0]); //u
-			mVBOData.push_back(mTextureCoords[i * 2 + 1]); //v
+            
+			mVBOData.push_back((*mTextureCoords)[i * 2 + 0]); //u
+			mVBOData.push_back((*mTextureCoords)[i * 2 + 1]); //v
 		}
 		glBufferSubData(GL_ARRAY_BUFFER, object->GetBufferOffset(), mVBOData.size() * sizeof(float), mVBOData.data());
 	}
@@ -206,11 +209,11 @@ namespace Engine::Core {
         CalculateDeltaTime();
 		//Draw Static Objects
 		glBindVertexArray(mStaticVAO);
-		glDrawElements(GL_TRIANGLES, 1000, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_LINES, 6 * mNumberOfStaticObjects, GL_UNSIGNED_INT, 0);
 
 		//Draw Dynamic Objects
 		glBindVertexArray(mDynamicVAO);
-		glDrawElements(GL_TRIANGLES, 1000, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6 * mNumberOfDynamicObjects, GL_UNSIGNED_INT, 0);
 
 		//std::cout << "Render Succes" << std::endl;
 	}
@@ -233,8 +236,6 @@ namespace Engine::Core {
         float CurrentTime = glfwGetTime();     // read once per frame
         DeltaTime = CurrentTime - LastTime;    // delta
         LastTime = CurrentTime;                // update for next frame
-
-        std::cout << "\nDelta Time is " << DeltaTime;
     }
     int GetFrameRate() {
         static int frames = 0;

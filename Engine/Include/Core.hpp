@@ -6,6 +6,8 @@
 #include <vector>
 #include <glad/glad.h>
 
+#include "Graphics.hpp"
+
 namespace Engine::Core {
 
 	class GameObject
@@ -15,7 +17,8 @@ namespace Engine::Core {
 		GameObject();
 
 		void SetVertices(std::array<float, 12> vertices);
-		void SetTextureCoords(std::array<float, 8> textureCoords);
+		void SetTextureCoords(std::array<float, 8>* textureCoords);
+        void BindTexture(Engine::Graphics::TextureAtlas* AnAtlas, const std::string& path);
 		void SetPosition(glm::vec2 position);
         void SetSize(glm::vec2 size);
 		void SetBufferOffset(size_t bufferOffset) { mBufferOffset = bufferOffset; }
@@ -24,7 +27,7 @@ namespace Engine::Core {
 		virtual ~GameObject() {}
 
 		const std::array<float, 12>& GetVertices() const { return mVertices; }
-		const std::array<float, 8>& GetTextureCoords() const { return mTexture; }
+		std::array<float, 8>* GetTextureCoords() const { return mTexture; }
 		const std::array<int, 6>& GetIndices() const { return mIndices; }
 		glm::vec2 GetPosition() const { return mPosition; }
 		size_t GetBufferOffset() const { return mBufferOffset; }
@@ -34,7 +37,8 @@ namespace Engine::Core {
         
     protected:
 		std::array<float, 12> mVertices;
-		std::array<float, 8> mTexture;
+		std::array<float, 8>* mTexture;
+        std::array<float,8> mTexture0 = {0, 0, 0, 0, 0, 0, 0, 0};
 		std::array<int, 6> mIndices;
 		glm::vec2 mPosition;
         glm::vec2 mSize;

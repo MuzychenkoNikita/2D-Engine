@@ -4,16 +4,16 @@
 #include "Interface.hpp"
 #include "Core.hpp"
 #include "Utils.hpp"
+#include "Graphics.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
-
-namespace Engine::Interface 
+namespace Engine::Interface
 {
 // --++==[][] FUNCTIONS [][]==++--
-void InitiateImGUI(GLFWwindow* window) {
+void InitiateImGui(GLFWwindow* window) {
     mWindow = window;
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -104,7 +104,7 @@ void InitiateImGUI(GLFWwindow* window) {
      SHAD::addTexture2D(addImportTextureID, "/Users/nikitamuzycenko/VSRepos/ShaderInterface/App/Source/Textures/icon.png");
      */
 }
-void RenderImGUI() {
+void RenderImGui() {
     // ImGui Render
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -116,7 +116,7 @@ void RenderImGUI() {
 
     ImGui::Render();
 }
-void CleanImGUI() {
+void CleanRenderImGui() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -127,10 +127,13 @@ void CleanImGUI() {
         glfwMakeContextCurrent(backup_current_context);
     }
 }
+void DestroyImGui() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}
 void FrameRateWindow() {
-    //===
     static int location = 0;
-    ImGuiIO& io = ImGui::GetIO();
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
     const float PAD = 10.0f;
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -151,12 +154,20 @@ void FrameRateWindow() {
         ImGui::Text("FPS:");
         ImGui::SameLine();
         ImGui::Text( "%s", std::to_string(Engine::Core::GetFrameRate()).c_str());
-        
     }
     ImGui::End();
-    //===
+    assert(Atlas && "Interface::Atlas not set");
+    ShowTextureAtlas();
 }
+void ShowTextureAtlas() {
+    if (ImGui::Begin("Texture Atlas Data")) {
+        ImGui::Image((ImTextureID)(intptr_t)Atlas->GetTextureID(), ImVec2(Atlas->GetTextureSize().x, Atlas->GetTextureSize().y));
+    }
+    ImGui::End();
+}
+void SetTextureAtlas(Engine::Graphics::TextureAtlas* AnAtlas) { Atlas = AnAtlas; }
 // --++==[][] VARIABLES [][]==++--
 GLFWwindow* mWindow = nullptr;
 ImGuiIO* io = nullptr;
+Engine::Graphics::TextureAtlas* Atlas = nullptr;
 }
