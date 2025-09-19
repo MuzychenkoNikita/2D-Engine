@@ -57,6 +57,9 @@ void GameObject::BindTexture(Engine::Graphics::TextureAtlas* Atlas, const std::s
         mVertices[3 * 3 + 0] = mPosition.x + mSize.x;
         mVertices[3 * 3 + 1] = mPosition.y + mSize.y;
     }
+void GameObject::PlayAnimation(Engine::Graphics::Animation* Animation) {
+    mTexture = Animation->GetCurrentFrameTextureData();
+}
     void PlayerCharacterObject::MoveX(bool Direction) {
         if (Direction) {
             SetPosition(glm::vec2(mPosition.x + (mSpeed * DeltaTime), mPosition.y));
@@ -209,7 +212,7 @@ void GameObject::BindTexture(Engine::Graphics::TextureAtlas* Atlas, const std::s
         CalculateDeltaTime();
 		//Draw Static Objects
 		glBindVertexArray(mStaticVAO);
-		glDrawElements(GL_LINES, 6 * mNumberOfStaticObjects, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6 * mNumberOfStaticObjects, GL_UNSIGNED_INT, 0);
 
 		//Draw Dynamic Objects
 		glBindVertexArray(mDynamicVAO);

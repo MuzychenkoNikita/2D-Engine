@@ -7,6 +7,7 @@ Binaries/
 *.vcxproj.user
 *.vcxproj.filters
 *.sln
+*.DS_Store
 *.log
 Makefile
 

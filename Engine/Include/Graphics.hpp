@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <queue>
@@ -73,15 +74,21 @@ private:
 class Animation
 {
 public:
-    Animation(TextureAtlas& Atlas);
+    Animation();
+    Animation(TextureAtlas* Atlas);
     
     void AddAnimationFrame(std::string path);
-    void SetFrameDuration();
+    void SetFrameDuration(float frameDuration) { mFrameDuration = frameDuration; }
+    void SetTextureAtlas(TextureAtlas* Atlas) { mAtlas = Atlas; }
+    std::array<float, 8>* GetCurrentFrameTextureData();
     
     ~Animation() {}
 private:
-    std::queue<std::string> mAnimationFrames;
+    std::vector<std::array<float, 8>*> mFramesTextureData;
     float mFrameDuration;
+    float mTimer;
+    int mCurrentFrame;
+    TextureAtlas* mAtlas;
     
 };
 }

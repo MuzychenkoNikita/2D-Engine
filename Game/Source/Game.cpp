@@ -145,18 +145,7 @@ int main()
 
 
 
-    Engine::Graphics::TextureAtlas Level_0_Atlas;          // real object
-    Engine::Interface::SetTextureAtlas(&Level_0_Atlas);
-    Level_0_Atlas.AddTexture("Assets/Texture/player_character.png");
-    Level_0_Atlas.AddTexture("Assets/Texture/player_character.jpg");
-    Level_0_Atlas.AddTexture("Assets/Texture/texture2.png");
-    Level_0_Atlas.AddTexture("Assets/Texture/texture1.png");
-    Level_0_Atlas.AddTexture("Assets/Texture/texture5.png");
-    Level_0_Atlas.AddTexture("Assets/Texture/texture3.png");
-    Level_0_Atlas.AddTexture("Assets/Texture/texture4.png");
-    Level_0_Atlas.AddTexture("Assets/Texture/1player_character.png");
-    Player.BindTexture(&Level_0_Atlas, "Assets/Texture/player_character.png");
-    Level_0_Atlas.GenTexture();
+    
     
     
 
@@ -183,7 +172,6 @@ int main()
 		glClearColor(0.2f, 0.4f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
         
-        Level_0.UpdateDynamicObject(&Player);
 
 		glUseProgram(shaderProgram);
 
@@ -225,14 +213,26 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         Player.MoveX(0);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        Player.PlayAnimation(&PlayerAnimationLeft);
+        Level_0.UpdateDynamicObject(&Player);
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         Player.MoveX(1);
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        Player.PlayAnimation(&PlayerAnimationRight);
+        Level_0.UpdateDynamicObject(&Player);
+    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         Player.MoveY(1);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        Player.PlayAnimation(&PlayerAnimationBack);
+        Level_0.UpdateDynamicObject(&Player);
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         Player.MoveY(0);
+        Player.PlayAnimation(&PlayerAnimationFront);
+        Level_0.UpdateDynamicObject(&Player);
+    }
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         Player.SetSpeed(Player.GetSpeed() - 0.1);
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)

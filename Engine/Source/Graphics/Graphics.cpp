@@ -1,4 +1,5 @@
 #include "Graphics.hpp"
+#include "Core.hpp"
 
 #define GL_SILENCE_DEPRECATION
 #include <GLFW/glfw3.h>
@@ -63,7 +64,7 @@ void TextureAtlas::GenTexture() {
         
         if (!allPacked) {
             for (auto* p : pixels) if (p) stbi_image_free(p);
-            continue;                                        // try next bigger size
+            continue;
         }
         
         int RectID = 0;
@@ -110,10 +111,27 @@ void TextureAtlas::GenTexture() {
 
     fprintf(stderr, "TextureAtlas: images did not fit into max candidate size.\n");
 }
+Animation::Animation()
+: mFrameDuration(0.f), mTimer(0.f), mCurrentFrame(0), mAtlas(nullptr) {}
+Animation::Animation(TextureAtlas* Atlas)
+: mFrameDuration(0.f), mTimer(0.f), mCurrentFrame(0), mAtlas(Atlas) {}
 
-Animation::Animation(TextureAtlas& Atlas)
-{}
 void Animation::AddAnimationFrame(std::string path) {
-    mAnimationFrames.push(path);
+    if (!mAtlas) return;
+    std::array<float,8>* uv = mAtlas->AddTexture(path);
+    if (uv) mFramesTextureData.push_back(uv);
+}
+std::array<float, 8>* Animation::GetCurrentFrameTextureData() {
+    if (mFramesTextureData.empty()) return nullptr;
+
+    if (mFrameDuration > 0.f) {
+        mTimer += Engine::Core::DeltaTime;
+        while (mTimer >= mFrameDuration) {
+            mTimer -= mFrameDuration;
+            mCurrentFrame = (mCurrentFrame + 1) % mFramesTextureData.size();
+        }
+    }
+
+    return mFramesTextureData[mCurrentFrame];
 }
 }

@@ -15,7 +15,6 @@
 		9223EFD8340D8BCA2B349E18 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 606C44802E8F9832B59DEAC0 /* CoreVideo.framework */; };
 		A89D1F16FF2A8988D7A39D56 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D05E77DED3CF4A10553BEE1E /* Game.cpp */; };
 		E92AFE81FB54DB332F45C4C1 /* Levels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9525329A3140F9BDD131169 /* Levels.cpp */; };
-		F09E056402C7E21636B8CBA4 /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2905E76C22C7A3DE5CC6A5AC /* Animation.cpp */; };
 		F8E8DBA28B76A594F44F49E2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D6BC6AA50D7885C8F7B2CEA /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
@@ -39,7 +38,6 @@
 /* Begin PBXFileReference section */
 		0BACC980CF188B320DBC2FC0 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		19352E0A6698243CDCB7244A /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		2905E76C22C7A3DE5CC6A5AC /* Animation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Animation.cpp; path = Source/Assets/Animation.cpp; sourceTree = "<group>"; };
 		2E38C4D3897A18455CD46313 /* Levels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Levels.h; path = Source/Assets/Level/Levels.h; sourceTree = "<group>"; };
 		52DEB99C6508964E98F97FDC /* libEngine.a */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Engine.xcodeproj"; path = ../Engine/Engine.xcodeproj; sourceTree = SOURCE_ROOT; };
 		597BEE36A6DEE4681CFDE476 /* Objects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Objects.h; path = Source/Assets/Entity/Objects.h; sourceTree = "<group>"; };
@@ -48,6 +46,7 @@
 		8D6BC6AA50D7885C8F7B2CEA /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		A17BB3A3F401DE95C64641E3 /* Game */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = Game; path = Game; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9525329A3140F9BDD131169 /* Levels.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Levels.cpp; path = Source/Assets/Level/Levels.cpp; sourceTree = "<group>"; };
+		A9C125F6A382E268DD81E436 /* Animation.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = Animation.hpp; path = Source/Assets/Animation.hpp; sourceTree = "<group>"; };
 		D05E77DED3CF4A10553BEE1E /* Game.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Game.cpp; path = Source/Game.cpp; sourceTree = "<group>"; };
 		EA5C1300C9792D32A5828940 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -97,7 +96,7 @@
 		1E02232EC14DAC60DC1E796E /* Assets */ = {
 			isa = PBXGroup;
 			children = (
-				2905E76C22C7A3DE5CC6A5AC /* Animation.cpp */,
+				A9C125F6A382E268DD81E436 /* Animation.hpp */,
 				6390DE646443DB56D825ACA4 /* Entity */,
 				2F6746BAA0F25F2C4FF384FA /* Level */,
 			);
@@ -229,7 +228,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F09E056402C7E21636B8CBA4 /* Animation.cpp in Sources */,
 				32B4CC04F942C3766744EA44 /* Objects.cpp in Sources */,
 				E92AFE81FB54DB332F45C4C1 /* Levels.cpp in Sources */,
 				A89D1F16FF2A8988D7A39D56 /* Game.cpp in Sources */,

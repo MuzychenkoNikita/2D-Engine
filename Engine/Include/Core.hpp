@@ -22,6 +22,7 @@ namespace Engine::Core {
 		void SetPosition(glm::vec2 position);
         void SetSize(glm::vec2 size);
 		void SetBufferOffset(size_t bufferOffset) { mBufferOffset = bufferOffset; }
+        void PlayAnimation(Engine::Graphics::Animation* Animation);
 		//void SetTexture();
 
 		virtual ~GameObject() {}
