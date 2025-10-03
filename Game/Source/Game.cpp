@@ -20,6 +20,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void CheckBorder(float vertices[], int XBorder, int YBorder);
 
+Engine::Interface::Interface mainInterface;
+
 // settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
@@ -88,7 +90,7 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
+    
 	// glad: load all OpenGL function pointers
 	// ---------------------------------------
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -96,7 +98,12 @@ int main()
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
-    Engine::Interface::InitiateImGui(window);
+    
+    // inializing interface
+    mainInterface.Init(window);
+    mainInterface.SetTextureAtlas(&Level_0_Atlas);
+
+    
 	// initilazing camera
     Engine::Graphics::Camera mCamera;
 	glm::vec3 mCameraPos;
@@ -167,7 +174,7 @@ int main()
 
 		// render
 		// ------
-        Engine::Interface::RenderImGui();
+        mainInterface.Render();
         
 		glClearColor(0.2f, 0.4f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -189,7 +196,7 @@ int main()
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         
-        Engine::Interface::CleanRenderImGui();
+        mainInterface.Clean();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -199,8 +206,6 @@ int main()
 	// ------------------------------------------------------------------------
 	glDeleteProgram(shaderProgram);
 	
-    Engine::Interface::DestroyImGui();
-
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
 	glfwTerminate();
@@ -211,6 +216,14 @@ int main()
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
 {
+    static bool prev[GLFW_KEY_LAST + 1] = {false};
+        auto pressed_once = [&](int key) {
+            bool down  = glfwGetKey(window, key) == GLFW_PRESS;
+            bool once  = down && !prev[key];   // edge: RELEASE -> PRESS
+            prev[key]  = down;
+            return once;
+        };
+    
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
@@ -244,6 +257,7 @@ void processInput(GLFWwindow* window)
 		Zoom = Zoom - 0.1f;
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 		Zoom = Zoom + 0.1f;
+    
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 		CamXOffset = CamXOffset - (0.1f * Velocity);
@@ -254,6 +268,9 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		CamYOffset = CamYOffset - (0.1f * Velocity);
 
+    if (pressed_once(GLFW_KEY_GRAVE_ACCENT)) {
+        mainInterface.ShowConsoleWindow(!mainInterface.GetConsoleP_open());
+    }
 }
 					
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
