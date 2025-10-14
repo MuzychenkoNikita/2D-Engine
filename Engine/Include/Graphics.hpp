@@ -4,10 +4,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+
 #include <queue>
+#include <vector>
+#include <iostream>
 
 #include "stb_image.h"
-
 #define STBRP_LARGE_RECTS
 #include "stb_rect_pack.h"
 
@@ -47,6 +49,51 @@ private:
 
 struct AtlasRect {
     float x = 0, y = 0, w = 10, h = 10;
+};
+
+class Shader {
+public:
+    Shader();
+    
+    void Init(GLenum shaderType, const char* shaderCode);
+    unsigned int GetID();
+    
+    ~Shader();
+    
+private:
+    void CheckCompileErrors();
+    
+private:
+    unsigned int mShaderID;
+};
+
+class ShaderProgram {
+public:
+    ShaderProgram();
+    
+    void Init(std::vector<unsigned int> shaderIDs);
+    unsigned int GetID();
+    void Use();
+    
+    ~ShaderProgram();
+    
+private:
+    void CheckCompileErrors();
+    
+private:
+    unsigned int mProgramID;
+};
+
+class ScreenEffect {
+public:
+    void Init(const char* code);
+    void Use(float iTime, glm::vec2 iResolution);
+    
+private:
+    Shader vertexShader;
+    Shader fragmentShader;
+    ShaderProgram effectShader;
+    GLuint VAO;
 };
 
 class TextureAtlas

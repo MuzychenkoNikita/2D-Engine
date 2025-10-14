@@ -135,6 +135,10 @@ public:
     static void  Strtrim(char* s)                                { char* str_end = s + strlen(s); while (str_end > s && str_end[-1] == ' ') str_end--; *str_end = 0; }
     //static void ShowExampleAppConsole(bool* p_open) { static Console console; console.Draw("Example: Console", p_open); }
     
+    void AddCommand(const char* name, std::function<void(const char* args)> fn);
+    void AddCommand(const char* name, void (*fn_noargs)());             // void()
+    void AddCommand(const char* name, void (*fn_args)(const char*));
+    
 public:
     char InputBuf[256];
     ImVector<char*> Items;
@@ -145,6 +149,10 @@ public:
     bool AutoScroll;
     bool ScrollToBottom;
     GLFWwindow* mWindow;
+    
+private:
+    std::unordered_map<std::string, std::function<void(const char* args)>> mCmds;
+    static inline std::string ToUpper(std::string s) { for (char& c : s) c = (char)toupper((unsigned char)c); return s; }
 };
 
 // --++==[][] FUNCTIONS [][]==++--
@@ -157,12 +165,19 @@ public:
     void Clean();
     void DestroyImGui();
     void SetTextureAtlas(Engine::Graphics::TextureAtlas* AnAtlas);
+    void SetConsole(Console* someConsole) { mainConsole = someConsole; }
+    void SetFPS(int* FPS) { mFPS = FPS; }
     
     bool GetConsoleP_open() { return mConsole_p_open; }
+    bool GetAtlasP_open() { return mAtlas_p_open; }
+    bool GetFPSP_open() { return mFPS_p_open; }
     
     void FrameRateWindow(); // Shows the rendered window Frame Rate
     void TextureAtlasWindow();
+    
     void ShowConsoleWindow(bool console_p_open) { mConsole_p_open = console_p_open; }
+    void ShowAtlasWindow();
+    void ShowFPSWindow();
     
     ~Interface();
     
@@ -170,7 +185,11 @@ private:
     GLFWwindow* mWindow;
     Engine::Graphics::TextureAtlas* Atlas;
     ImGuiIO* io;
-    Console mainConsole;
+    Console* mainConsole;
+    int* mFPS;;
+    
     bool mConsole_p_open;
+    bool mAtlas_p_open;
+    bool mFPS_p_open;
 };
 }

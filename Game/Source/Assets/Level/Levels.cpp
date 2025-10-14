@@ -60,13 +60,7 @@ void Init_Level_0() {
     Level_0_Atlas.GenTexture();
     
     // Static Objects
-    auto* tile = new Engine::Core::GameObject();
-    tile->SetPosition(glm::vec2(1, 0));
-    Level_0.AddStaticObject(tile);
 
-    auto* tile2 = new Engine::Core::GameObject();
-    tile2->SetPosition(glm::vec2(0, 0));
-    Level_0.AddStaticObject(tile2);
     
     for (int i = 0; i < 100; i++) {
         auto* tiles = new Engine::Core::GameObject();

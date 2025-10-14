@@ -15,7 +15,6 @@ Console::Console()
     Commands.push_back("HISTORY");
     Commands.push_back("CLEAR");
     Commands.push_back("CLASSIFY");
-    Commands.push_back("TEXTURE_ATLAS");
     AutoScroll = true;
     ScrollToBottom = false;
     AddLog("[message]\n\n--==[]Welcome to Engine Console[]==--\n\n        Enter 'HELP' for help.\n\n");
@@ -196,13 +195,40 @@ void Console::ExecCommand(const char* command_line) {
     else if (Stricmp(command_line, "TEXTURE_ATLAS") == 0) {
         AddLog("[message] Current Texture Atlas Data is shown");
     }
-    else
-        AddLog("Unknown command: '%s'\n", command_line);
+    else {
+        // Try user-registered commands before printing "Unknown"
+        const char* line = command_line;
+        while (*line == ' ' || *line == '\t') ++line;
+        const char* sp = strchr(line, ' ');
+        std::string cmd = ToUpper(std::string(line, sp ? (size_t)(sp - line) : strlen(line)));
+        const char* args = sp ? (sp + 1) : "";
+
+        auto it = mCmds.find(cmd);
+        if (it != mCmds.end()) {
+            try { it->second(args); }
+            catch (const std::exception& e) { AddLog("[error] %s", e.what()); }
+        } else {
+            AddLog("Unknown command: '%s'\n", command_line);
+        }
+    }
 
     // On command input, we scroll to bottom even if AutoScroll==false
     ScrollToBottom = true;
 }
+void Console::AddCommand(const char* name, std::function<void(const char* args)> fn) {
+    std::string key = ToUpper(name);
+    mCmds[key] = std::move(fn);
+    // keep your tab-completion working
+    Commands.push_back(Strdup(key.c_str()));
+}
 
+void Console::AddCommand(const char* name, void (*fn_noargs)()) {
+    AddCommand(name, [fn_noargs](const char*) { fn_noargs(); });
+}
+
+void Console::AddCommand(const char* name, void (*fn_args)(const char*)) {
+    AddCommand(name, [fn_args](const char* a) { fn_args(a); });
+}
 Console::~Console() {
     ClearLog();
     for (int i = 0; i < History.Size; i++)
